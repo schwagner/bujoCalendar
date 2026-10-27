@@ -1,8 +1,8 @@
 <title>Daily Spread Stencil</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Allerta+Stencil&display=swap">
 <style>
-/* Layout: a short intro, three A5 plates side by side (wrap to one column), then the lip section and open questions. */
+/* Layout: a short intro with method/view toggles, three A5 plates side by side (wrap to one column), then the lip section and open questions. */
 :root {
   --bg: #eef0ec;
   --fg: #22262a;
@@ -17,6 +17,7 @@
   --card: #f8f9f6;
   --f-display: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --f-stencil: "Allerta Stencil", "Stencil", "Arial Black", sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #171a1c; --fg: #e4e7e3; --muted: #9aa39f; --rule: #343a3d; --paper: #e9e7df; --dot: #9a9e98;
@@ -35,11 +36,14 @@ h3 { font-size: 17px; margin: 0; }
 p { margin: 0; }
 .eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .lede { color: var(--muted); }
-.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.controls label { font: 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ctl { display: flex; gap: 8px; align-items: center; }
 .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
 .seg button { font: 500 13px var(--f-mono); padding: 7px 12px; border: 0; background: transparent; color: var(--fg); cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--stencil); color: #fff; }
 .seg button:focus-visible { outline: 2px solid var(--stencil); outline-offset: -2px; }
+.spec { font: 13px var(--f-mono); color: var(--muted); }
 .plates { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
 .plate { display: grid; gap: 12px; align-content: start; min-width: 0; }
 .plate svg { width: 100%; height: auto; display: block; }
@@ -63,11 +67,22 @@ ol.q { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 72ch; 
     <h1>Daily spread stencil, three directions</h1>
     <p class="lede">Each plate is drawn to scale in millimetres over an A5 page. Every slot sits on the 5 mm dot pitch. The dark band at the top is the lip that hooks over the page edge. Gaps in long slots are bridges that hold the stencil together; you close them by hand.</p>
     <div class="controls">
-      <div class="seg" role="group" aria-label="View">
-        <button id="v-stencil" aria-pressed="true">Stencil on page</button>
-        <button id="v-ink" aria-pressed="false">Traced result</button>
+      <div class="ctl">
+        <label for="m-trace">Method</label>
+        <div class="seg" role="group" aria-label="Method">
+          <button id="m-trace" aria-pressed="true">Pen trace</button>
+          <button id="m-roll" aria-pressed="false">Ink roller</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <label for="v-plate">View</label>
+        <div class="seg" role="group" aria-label="View">
+          <button id="v-plate" aria-pressed="true">Stencil on page</button>
+          <button id="v-ink" aria-pressed="false">Result</button>
+        </div>
       </div>
     </div>
+    <p class="spec" id="spec"></p>
   </header>
 
   <div class="plates" id="plates"></div>
@@ -89,7 +104,7 @@ ol.q { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 72ch; 
           <!-- stencil plate + lip -->
           <path d="M -1.6 -1.4 L 70 -1.4 L 70 0 L 0.2 0 L 0.2 0 L -0.2 0 L -0.2 3 L -1.6 3 Z" fill="var(--stencil)" stroke="var(--stencil-edge)" stroke-width=".15"/>
           <g class="svg-label" font-size="1.7">
-            <text x="20" y="-3">plate 1.4 mm, slots cut through</text>
+            <text x="16" y="-3">plate 1.4 mm (trace) · 0.6 mm (roller)</text>
             <text x="-15" y="5.2">lip</text>
             <text x="-15" y="7.2">3 mm drop</text>
             <text x="24" y="7">book block (pages)</text>
@@ -101,10 +116,10 @@ ol.q { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 72ch; 
       </div>
       <div style="display:grid;gap:12px">
         <p>The lip is a fence on the underside. It drops about 3 mm and butts against the top edge of the whole text block, so it registers every page the same way. This sets vertical position.</p>
-        <p>Horizontal position comes from the two round registration windows. Slide the stencil left or right until a printed dot sits centred in each window, then draw.</p>
+        <p>Horizontal position comes from the two round registration windows. Slide the stencil left or right until a printed dot sits centred in each window, then draw. With a roller, roll from the foot of the page toward the lip so the stroke pushes the stencil into its seat.</p>
         <dl>
-          <dt>Plate</dt><dd>1.4 mm PETG or PLA, slots 1.0 mm wide (fits 0.3–0.5 mm fineliners)</dd>
-          <dt>Bridges</dt><dd>2.5 mm, roughly every 40 mm on long slots</dd>
+          <dt>Pen trace</dt><dd>1.4 mm plate, 1.0 mm slots (fits 0.3–0.5 mm fineliners), 2.5 mm bridges, etched labels</dd>
+          <dt>Ink roller</dt><dd>0.6 mm plate, 1.3 mm slots with a 45° bevel on the top edge, 1.0 mm bridges, circles and boxes cut as bridged rings, numbers and letters cut through in a stencil face</dd>
           <dt>Spine side</dt><dd>Plate stops 12 mm from the gutter so it lies flat on a hardcover</dd>
           <dt>Grid offset</dt><dd>Assumed dots at x = 4 + 5n, y = 5 + 5n. This will be a parameter in the SCAD.</dd>
         </dl>
@@ -116,9 +131,10 @@ ol.q { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 72ch; 
     <h2>Decisions before the SCAD</h2>
     <ol class="q">
       <li>Which plate, or which parts to combine.</li>
+      <li>Pen, roller, or both from one SCAD file with a mode switch.</li>
       <li>Left-hand pages: a mirrored second print, or a lip that drops on both faces so one stencil flips?</li>
       <li>Where your notebook's dots actually start from the top and outer edges. One measurement each is enough.</li>
-      <li>Engraved hour numbers and day letters (raised or recessed on the top face), or plain?</li>
+      <li>For pen tracing: etched hour numbers and day letters on the top face, or a plain plate?</li>
     </ol>
   </section>
 </div>
@@ -127,29 +143,55 @@ ol.q { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 72ch; 
 const PAGE = { w: 148, h: 210 };
 const GRID = { pitch: 5, ox: 4, oy: 5 };
 const ST = { x0: 12, x1: 146, y0: 0, y1: 208, lip: 3 };
-const SLOT = 1.0, BRIDGE = 2.5, SPAN = 40;
+const MODES = {
+  trace: { slot: 1.0, bridge: 2.5, span: 40, roll: false, plate: 1.4 },
+  roll:  { slot: 1.3, bridge: 1.0, span: 40, roll: true,  plate: 0.6 },
+};
+let CFG = MODES.trace;
+
+// Centreline gap between slot ends; round end caps eat half a slot width on each side.
+const gap = () => CFG.bridge + CFG.slot;
 
 // Split a straight slot into bridged segments.
 function slot(x1, y1, x2, y2) {
   const L = Math.hypot(x2 - x1, y2 - y1);
-  if (L <= SPAN + 5) return [{ t: "poly", p: [[x1, y1], [x2, y2]] }];
-  const n = Math.ceil(L / SPAN), seg = (L - (n - 1) * BRIDGE) / n, ux = (x2 - x1) / L, uy = (y2 - y1) / L;
+  if (L <= CFG.span + 5) return [{ t: "poly", p: [[x1, y1], [x2, y2]] }];
+  const n = Math.ceil(L / CFG.span), g = gap(), seg = (L - (n - 1) * g) / n, ux = (x2 - x1) / L, uy = (y2 - y1) / L;
   const out = [];
   for (let i = 0; i < n; i++) {
-    const a = i * (seg + BRIDGE), b = a + seg;
+    const a = i * (seg + g), b = a + seg;
     out.push({ t: "poly", p: [[x1 + ux * a, y1 + uy * a], [x1 + ux * b, y1 + uy * b]] });
   }
   return out;
 }
 const poly = (...p) => ({ t: "poly", p });
-const hole = (x, y, r) => ({ t: "hole", x, y, r });
-const reg = (x, y) => ({ t: "reg", x, y, r: 1.3 });
-const sq = (x, y, s) => ({ t: "sq", x, y, s });
-const txt = (x, y, s, size = 2.2, anchor = "middle") => ({ t: "txt", x, y, s, size, anchor });
-const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
+const reg = (x, y) => ({ t: "reg", x, y, r: CFG.roll ? 1.8 : 1.3 });
+const txt = (x, y, s, size = 2.2, anchor = "middle") => ({ t: "txt", x, y, s, size: CFG.roll ? size * 1.35 : size, anchor });
 
+// A round hole for tracing; a ring slot with three bridges for rolling.
+function hole(x, y, r) {
+  if (!CFG.roll) return [{ t: "hole", x, y, r }];
+  const R = r + 0.3, da = gap() / R, arc = (2 * Math.PI - 3 * da) / 3, out = [];
+  for (let i = 0; i < 3; i++) {
+    const a0 = -Math.PI / 2 + da / 2 + i * (arc + da), p = [];
+    for (let k = 0; k <= 12; k++) { const a = a0 + arc * k / 12; p.push([x + R * Math.cos(a), y + R * Math.sin(a)]); }
+    out.push({ t: "poly", p });
+  }
+  return out;
+}
+// A square hole for tracing; four corner Ls with mid-side bridges for rolling.
+function sq(x, y, s) {
+  if (!CFG.roll) return [{ t: "sq", x, y, s }];
+  const h = (s + 2) / 2, a = h - gap() / 2;
+  return [
+    poly([x - h, y - h + a], [x - h, y - h], [x - h + a, y - h]), poly([x + h - a, y - h], [x + h, y - h], [x + h, y - h + a]),
+    poly([x - h, y + h - a], [x - h, y + h], [x - h + a, y + h]), poly([x + h - a, y + h], [x + h, y + h], [x + h, y + h - a]),
+  ];
+}
+
+const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
 function days(x0, y, step = 10, r = 1.75) {
-  return DAYS.flatMap((d, i) => [hole(x0 + i * step, y, r), txt(x0 + i * step, y - 4.2, d)]);
+  return DAYS.flatMap((d, i) => [...hole(x0 + i * step, y, r), txt(x0 + i * step, y - 4.2, d)]);
 }
 function corners(x0, y0, x1, y1, a) {
   return [poly([x0, y0 + a], [x0, y0], [x0 + a, y0]), poly([x1 - a, y0], [x1, y0], [x1, y0 + a]),
@@ -166,7 +208,7 @@ function timeline(x, yStart, hFrom, hTo, rail) {
   return els;
 }
 
-const VARIANTS = [
+const variants = () => [
   {
     id: "A", name: "Cousin", tag: "full-day timeline",
     notes: ["24-hour rail, 0–23, one hour per row", "Date box and day-of-week circles", "Wide free area to the right", "Quote rule near the foot of the page"],
@@ -188,8 +230,8 @@ const VARIANTS = [
       ...slot(14, 30, 144, 30),
       ...timeline(29, 35, 6, 24, true),
       ...slot(89, 35, 89, 165),
-      txt(116, 33.6, "TO DO", 2),
-      ...Array.from({ length: 13 }, (_, i) => sq(94, 40 + i * 10, 3)),
+      txt(116, 33.9, "TO DO", 2),
+      ...Array.from({ length: 13 }, (_, i) => sq(94, 40 + i * 10, 3)).flat(),
       ...slot(14, 170, 144, 170),
       ...corners(19, 175, 139, 195, 4),
       reg(139, 20), reg(79, 200),
@@ -203,7 +245,7 @@ const VARIANTS = [
       poly([19, 25], [39, 25]),
       ...days(49, 20, 10, 1.5),
       ...slot(19, 30, 139, 30),
-      ...timeline(24, 40, 6, 24, false),
+      ...timeline(29, 40, 6, 24, false),
       reg(139, 20), reg(79, 195),
     ],
   },
@@ -212,10 +254,17 @@ const VARIANTS = [
 const NS = "http://www.w3.org/2000/svg";
 const el = (n, a = {}) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
 const pts = p => p.map(q => q.join(",")).join(" ");
+function label(e, fill) {
+  const font = CFG.roll ? "var(--f-stencil)" : "var(--f-mono)";
+  const t = el("text", { x: e.x, y: e.y, "text-anchor": e.anchor,
+    style: `font-family:${font};font-size:${e.size}px;font-weight:${CFG.roll ? 400 : 600};fill:${fill}` });
+  t.textContent = e.s;
+  return t;
+}
 
-function render(v, mode) {
+function render(v, view) {
   const svg = el("svg", { viewBox: `-6 ${-ST.lip - 6} ${PAGE.w + 12} ${PAGE.h + ST.lip + 12}`, role: "img",
-    "aria-label": `Plate ${v.id}, ${v.name}: ${mode === "ink" ? "traced result" : "stencil on page"}` });
+    "aria-label": `Plate ${v.id}, ${v.name}, ${CFG.roll ? "ink roller" : "pen trace"}: ${view === "ink" ? "result" : "stencil on page"}` });
   const defs = el("defs");
   const grad = el("linearGradient", { id: `sp${v.id}`, x1: "0", x2: "1" });
   grad.append(el("stop", { offset: "0", "stop-color": "#000", "stop-opacity": ".18" }), el("stop", { offset: "1", "stop-color": "#000", "stop-opacity": "0" }));
@@ -229,12 +278,15 @@ function render(v, mode) {
     for (let y = GRID.oy; y < PAGE.h; y += GRID.pitch) g.append(el("circle", { cx: x, cy: y, r: .3, fill: "var(--dot)" }));
   svg.append(defs, g);
 
-  if (mode === "ink") {
-    const ink = el("g", { fill: "none", stroke: "var(--ink)", "stroke-width": .4, "stroke-linecap": "round", "stroke-linejoin": "round" });
+  if (view === "ink") {
+    // Pen lines follow the slot wall; rolled ink fills the whole slot.
+    const w = CFG.roll ? CFG.slot : .4;
+    const ink = el("g", { fill: "none", stroke: "var(--ink)", "stroke-width": w, "stroke-linecap": "round", "stroke-linejoin": "round" });
     for (const e of v.els) {
       if (e.t === "poly") ink.append(el("polyline", { points: pts(e.p) }));
       if (e.t === "hole") ink.append(el("circle", { cx: e.x, cy: e.y, r: e.r - .2 }));
       if (e.t === "sq") ink.append(el("rect", { x: e.x - e.s / 2 + .2, y: e.y - e.s / 2 + .2, width: e.s - .4, height: e.s - .4 }));
+      if (e.t === "txt" && CFG.roll) ink.append(label(e, "var(--ink)"));
     }
     svg.append(ink);
     return svg;
@@ -243,47 +295,55 @@ function render(v, mode) {
   // stencil body with cutouts as a mask
   const mask = el("mask", { id: `m${v.id}`, maskUnits: "userSpaceOnUse" });
   mask.append(el("rect", { x: -10, y: -10, width: 200, height: 240, fill: "#fff" }));
-  const cut = el("g", { stroke: "#000", fill: "#000", "stroke-width": SLOT, "stroke-linecap": "round", "stroke-linejoin": "round" });
+  const cut = el("g", { stroke: "#000", fill: "#000", "stroke-width": CFG.slot, "stroke-linecap": "round", "stroke-linejoin": "round" });
   for (const e of v.els) {
     if (e.t === "poly") cut.append(el("polyline", { points: pts(e.p), fill: "none" }));
     if (e.t === "hole" || e.t === "reg") cut.append(el("circle", { cx: e.x, cy: e.y, r: e.r, stroke: "none" }));
     if (e.t === "sq") cut.append(el("rect", { x: e.x - e.s / 2, y: e.y - e.s / 2, width: e.s, height: e.s, stroke: "none" }));
+    if (e.t === "txt" && CFG.roll) { const t = label(e, "#000"); t.setAttribute("stroke", "none"); cut.append(t); }
   }
   mask.append(cut);
   defs.append(mask);
 
   const body = `M ${ST.x0} ${ST.y0} H ${ST.x1} V ${ST.y1 - 3} Q ${ST.x1} ${ST.y1} ${ST.x1 - 3} ${ST.y1} H ${ST.x0 + 3} Q ${ST.x0} ${ST.y1} ${ST.x0} ${ST.y1 - 3} Z`;
-  svg.append(el("path", { d: body, fill: "var(--stencil)", "fill-opacity": .5, mask: `url(#m${v.id})`, stroke: "var(--stencil-edge)", "stroke-width": .35 }));
+  svg.append(el("path", { d: body, fill: "var(--stencil)", "fill-opacity": CFG.roll ? .38 : .5, mask: `url(#m${v.id})`, stroke: "var(--stencil-edge)", "stroke-width": .35 }));
   svg.append(el("rect", { x: ST.x0, y: -ST.lip, width: ST.x1 - ST.x0, height: ST.lip, fill: "var(--stencil-edge)" }));
 
-  // registration window rings + engraved labels
+  // registration window rings, plus etched labels when tracing
   const deco = el("g");
   for (const e of v.els) {
     if (e.t === "reg") deco.append(el("circle", { cx: e.x, cy: e.y, r: e.r + .9, fill: "none", stroke: "var(--engrave)", "stroke-width": .25, "stroke-dasharray": ".8 .6" }));
-    if (e.t === "txt") { const t = el("text", { x: e.x, y: e.y, "font-size": e.size, "text-anchor": e.anchor, fill: "var(--engrave)", "font-family": "var(--f-mono)", "font-weight": 600 }); t.textContent = e.s; deco.append(t); }
+    if (e.t === "txt" && !CFG.roll) deco.append(label(e, "var(--engrave)"));
   }
   svg.append(deco);
   return svg;
 }
 
-let mode = "stencil";
+let method = "trace", view = "plate";
 function draw() {
+  CFG = MODES[method];
   const host = document.getElementById("plates");
   host.replaceChildren();
-  for (const v of VARIANTS) {
+  for (const v of variants()) {
     const card = document.createElement("article");
     card.className = "plate";
     card.innerHTML = `<div><span class="tag">PLATE ${v.id} · ${v.tag}</span><h3>${v.name}</h3></div>`;
-    card.append(render(v, mode));
+    card.append(render(v, view));
     const ul = document.createElement("ul");
     for (const n of v.notes) { const li = document.createElement("li"); li.textContent = n; ul.append(li); }
     card.append(ul);
     host.append(card);
   }
-  document.getElementById("v-stencil").setAttribute("aria-pressed", mode === "stencil");
-  document.getElementById("v-ink").setAttribute("aria-pressed", mode === "ink");
+  document.getElementById("spec").textContent =
+    `${CFG.plate} mm plate · ${CFG.slot} mm slots · ${CFG.bridge} mm bridges` +
+    (CFG.roll ? " · rings, boxes and numbers cut through" : " · labels etched, not cut");
+  for (const [id, on] of [["m-trace", method === "trace"], ["m-roll", method === "roll"], ["v-plate", view === "plate"], ["v-ink", view === "ink"]])
+    document.getElementById(id).setAttribute("aria-pressed", on);
 }
-document.getElementById("v-stencil").onclick = () => { mode = "stencil"; draw(); };
-document.getElementById("v-ink").onclick = () => { mode = "ink"; draw(); };
+document.getElementById("m-trace").onclick = () => { method = "trace"; draw(); };
+document.getElementById("m-roll").onclick = () => { method = "roll"; draw(); };
+document.getElementById("v-plate").onclick = () => { view = "plate"; draw(); };
+document.getElementById("v-ink").onclick = () => { view = "ink"; draw(); };
+document.fonts?.ready.then(draw);
 draw();
 </script>
