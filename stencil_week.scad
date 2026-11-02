@@ -38,6 +38,15 @@ relief_w = 0.25;
 relief_d = 0.4;
 
 /* [Labels] */
+// Cut day names through the plate so you can trace them; off etches them instead
+day_stencil = true;
+letter_h = 5;
+letter_w = 3.5;
+letter_gap = 1.75;
+// Chamfer on letter corners
+letter_c = 0.8;
+// Material left in the gap that holds the inside of A, D, O and R
+letter_bridge = 1.0;
 etch_labels = true;
 etch_d = 0.4;
 label_size = 2.2;
@@ -65,13 +74,13 @@ module cuts() {
     for (r = rows) bridged(G(x0, r), G(x1, r));
     // Date column rule, bridged once per day
     for (i = [0 : 6]) mid_bridged(G(xd, rows[i]), G(xd, rows[i + 1]));
+    // Day names, centred in the date column just under each rule
+    if (day_stencil) for (i = [0 : 6]) stencil_word(days[i], G((x0 + xd) / 2, rows[i]) - [0, 2.25 + letter_h]);
     // Registration windows, centred on dots
     for (p = [G(24, 1), G(14, 39)]) translate(p) circle(r = reg_r);
 }
 
-module labels() {
-    for (i = [0 : 6]) translate(G(x0, rows[i]) + [1, -1.7])
-        text(days[i], size = label_size, font = label_font, valign = "top");
-}
+module labels() if (!day_stencil) for (i = [0 : 6]) translate(G(x0, rows[i]) + [1, -1.7])
+    text(days[i], size = label_size, font = label_font, valign = "top");
 
 place() stencil_body(outer_margin, page_w - spine_gap) { cuts(); labels(); }

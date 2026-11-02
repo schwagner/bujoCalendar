@@ -42,6 +42,15 @@ relief_w = 0.25;
 relief_d = 0.4;
 
 /* [Labels] */
+// Cut day names through the plate so you can trace them; off etches them instead
+day_stencil = true;
+letter_h = 5;
+letter_w = 3.5;
+letter_gap = 1.75;
+// Chamfer on letter corners
+letter_c = 0.8;
+// Material left in the gap that holds the inside of A, D, O and R
+letter_bridge = 1.0;
 etch_labels = true;
 etch_d = 0.4;
 label_size = 2.2;
@@ -70,15 +79,18 @@ module cuts() {
     grid_lines(xs, ys);
     // Month box above the grid on the left page
     if (left) corners(G(2, 0), G(8, 3), 3);
+    if (day_stencil) stencil_heads();
     // Registration windows, centred on dots
     for (p = left ? [G(24, 1), G(14, 38)] : [G(4, 1), G(24, 38)]) translate(p) circle(r = reg_r);
 }
 
-module labels() {
-    for (i = [0 : len(names) - 1]) translate(G((xs[i] + xs[i + 1]) / 2, ys[0]) + [0, 1.6])
-        text(names[i], size = label_size, font = label_font, halign = "center");
-    if (!left) translate(G((xs[3] + xs[4]) / 2, ys[0]) + [0, 1.6])
-        text("NOTES", size = label_size, font = label_font, halign = "center");
-}
+// Column headings: day names, plus NOTES over the last column on the right page
+heads = left ? names : concat(names, ["NOTES"]);
+function head_at(i) = G((xs[i] + xs[i + 1]) / 2, ys[0]);
+
+module stencil_heads() for (i = [0 : len(heads) - 1]) stencil_word(heads[i], head_at(i) + [0, 2.25]);
+
+module labels() if (!day_stencil) for (i = [0 : len(heads) - 1]) translate(head_at(i) + [0, 1.6])
+    text(heads[i], size = label_size, font = label_font, halign = "center");
 
 place() stencil_body(plate_x0, plate_x1) { cuts(); labels(); }

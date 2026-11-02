@@ -12,6 +12,8 @@
 
 The lip on the underside seats against the top edge of the pages, which sets the vertical position. Slide the stencil sideways until a printed dot sits centred in each of the two round windows. Gaps in the long slots are bridges; join them by hand. On the monthly grid every cell edge has one bridge at its midpoint, so the crossings come out exact and you only close short straight gaps.
 
+Day names (and NOTES) on the weekly and monthly plates are cut through as single-stroke letters, 5 mm tall, in the same 1 mm slots as the lines, so you trace them in one pass. A, D, O and R each keep one small gap so their insides stay attached: a nicked top-left corner on D, O and R, and a short break in the right leg of A. Close these by hand like the bridges. Set `day_stencil = false` to etch the names instead.
+
 Left-hand plates (weekly, monthly left) measure `grid_ox` from the outer edge of the page instead of the spine.
 
 ## Build

@@ -73,6 +73,44 @@ module place() {
     else children();
 }
 
+// ---- Single-stroke stencil letters ----
+// Each letter is a set of polylines cut as slots, so a fineliner traces it in one stroke.
+// Cell is letter_w x letter_h with the origin at the bottom left. Closed shapes (A, D, O, R)
+// leave one small gap so the inside stays attached: a nicked top-left corner on D, O and R,
+// a break in the right leg of A. Close it by hand like a bridge.
+// Only the letters the day names and NOTES need are defined.
+
+function glyph(ch) = let(W = letter_w, H = letter_h, c = letter_c, g = letter_bridge + slot_w,
+                         // corner nick: slot ends a apart on both axes are g apart diagonally
+                         a = g / sqrt(2),
+                         // A: crossbar at t1 up the right leg, leg resumes g further along
+                         t1 = 0.35, t2 = t1 + g / norm([W / 2, H]),
+                         R = function(t) [W - t * W / 2, t * H])
+    ch == "A" ? [[[0, 0], [W / 2, H], R(t2)], [R(t1), [W, 0]], [[t1 * W / 2, t1 * H], R(t1)]]
+  : ch == "D" ? [[[0, 0], [0, H - a]], [[a, H], [W - c, H], [W, H - c], [W, c], [W - c, 0], [0, 0]]]
+  : ch == "E" ? [[[W, H], [0, H], [0, 0], [W, 0]], [[0, H / 2], [0.8 * W, H / 2]]]
+  : ch == "F" ? [[[W, H], [0, H], [0, 0]], [[0, H / 2], [0.8 * W, H / 2]]]
+  : ch == "H" ? [[[0, 0], [0, H]], [[W, 0], [W, H]], [[0, H / 2], [W, H / 2]]]
+  : ch == "I" ? [[[W / 2, 0], [W / 2, H]]]
+  : ch == "M" ? [[[0, 0], [0, H], [W / 2, 0.4 * H], [W, H], [W, 0]]]
+  : ch == "N" ? [[[0, 0], [0, H], [W, 0], [W, H]]]
+  : ch == "O" ? [[[a, H], [W - c, H], [W, H - c], [W, c], [W - c, 0], [c, 0], [0, c], [0, H - a]]]
+  : ch == "R" ? [[[0, 0], [0, H - a]], [[a, H], [W - c, H], [W, H - c], [W, H / 2 + c], [W - c, H / 2], [0, H / 2]], [[0.4 * W, H / 2], [W, 0]]]
+  : ch == "S" ? [[[W, H - c / 2], [W - c, H], [c, H], [0, H - c], [0, H / 2 + c], [c, H / 2], [W - c, H / 2], [W, H / 2 - c], [W, c], [W - c, 0], [c, 0], [0, c / 2]]]
+  : ch == "T" ? [[[0, H], [W, H]], [[W / 2, H], [W / 2, 0]]]
+  : ch == "U" ? [[[0, H], [0, c], [c, 0], [W - c, 0], [W, c], [W, H]]]
+  : ch == "W" ? [[[0, H], [W / 4, 0], [W / 2, 0.6 * H], [3 * W / 4, 0], [W, H]]]
+  : [];
+
+function word_w(s) = len(s) * (letter_w + letter_gap) - letter_gap;
+
+// Word as stencil slots, baseline centred on p.
+module stencil_word(s, p) {
+    adv = letter_w + letter_gap;
+    translate(p - [word_w(s) / 2, 0]) for (i = [0 : len(s) - 1])
+        translate([i * adv, 0]) for (pl = glyph(s[i])) polyline(pl);
+}
+
 function day_names(start) = start == "sun"
     ? ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
     : ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
