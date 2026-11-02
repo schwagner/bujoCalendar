@@ -3,7 +3,7 @@
 3D-printable stencils for Hobonichi Techo–style daily, weekly and monthly pages in a generic A5 hardcover notebook with a 5 mm dot grid.
 
 - `stencil_b.scad` — Plate B: date box, day-of-week circles, 6–24 timeline, to-do column, quote box. Right-hand page, for pen tracing.
-- `stencil_week.scad` — Techo Cousin-style vertical weekly, left-hand page: seven 15 mm day columns with an hourly timeline rail (8–23 by default, one hour per dot row, numbers etched) on the outer edge, a header band for the day name and date, and a free band under the timeline. The right-hand memo page is plain dot grid, so it has no plate.
+- `stencil_week.scad` — Techo Cousin-style vertical weekly across the spread, two plates (`page = "left"` / `"right"`): an hourly timeline rail on the outer edge of the left page (8–23 by default, one hour per dot row, numbers etched), Mon–Thu on the left and Fri–Sun plus a notes column on the right. Each 25 mm day column has a header band for the day name and date, the timeline band, and a free band underneath.
 - `stencil_month.scad` — monthly spread, two plates (`page = "left"` / `"right"`): six week rows of 30 × 25 mm day cells, Mon–Thu on the left page and Fri–Sun plus a notes column on the right. Set `week_start = "sun"` for a Sunday start.
 - `stencil_lib.scad` — shared slot, bridge and plate code used by the weekly and monthly plates.
 - `mockups/index.html` — to-scale layout mockups of plates A, B and C, for pen and ink roller.
@@ -12,15 +12,16 @@
 
 The lip on the underside seats against the top edge of the pages, which sets the vertical position. Slide the stencil sideways until a printed dot sits centred in each of the two round windows. Gaps in the long slots are bridges; join them by hand. On the monthly grid every cell edge has one bridge at its midpoint, so the crossings come out exact and you only close short straight gaps.
 
-Day names (two letters on the weekly plate, three on the monthly; NOTES too) are cut through as single-stroke letters, 5 mm tall, in the same 1 mm slots as the lines, so you trace them in one pass. A, D, O and R each keep one small gap so their insides stay attached: a nicked top-left corner on D, O and R, and a short break in the right leg of A. Close these by hand like the bridges. Set `day_stencil = false` to etch the names instead.
+Day names (and NOTES) are cut through as single-stroke letters, 5 mm tall, in the same 1 mm slots as the lines, so you trace them in one pass. A, D, O and R each keep one small gap so their insides stay attached: a nicked top-left corner on D, O and R, and a short break in the right leg of A. Close these by hand like the bridges. Set `day_stencil = false` to etch the names instead.
 
-Left-hand plates (weekly, monthly left) measure `grid_ox` from the outer edge of the page instead of the spine.
+Left-hand plates measure `grid_ox` from the outer edge of the page instead of the spine.
 
 ## Build
 
 ```sh
 openscad -o stencil_b.stl stencil_b.scad
-openscad -o stencil_week.stl stencil_week.scad
+openscad -D 'page="left"'  -o stencil_week_left.stl   stencil_week.scad
+openscad -D 'page="right"' -o stencil_week_right.stl  stencil_week.scad
 openscad -D 'page="left"'  -o stencil_month_left.stl  stencil_month.scad
 openscad -D 'page="right"' -o stencil_month_right.stl stencil_month.scad
 ```
