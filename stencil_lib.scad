@@ -31,9 +31,19 @@ module bridged(a, b, at = undef) {
 module mid_bridged(a, b) bridged(a, b, at = [norm(b - a) / 2]);
 
 // Closed grid whose lines sit on dot columns `xs` and dot rows `ys`.
+// Edge of an enclosed cell: always at least one bridge, more on long edges. Bridges on
+// vertical edges snap to half-dot rows so they never land where a tick meets the line.
+module edge(a, b) {
+    L = norm(b - a);
+    n = max(2, ceil(L / bridge_span));
+    snap = abs(a[0] - b[0]) < 1e-6;
+    bridged(a, b, at = [for (i = [1 : n - 1]) let(x = i * L / n)
+        snap ? (round(x / grid_pitch - 0.5) + 0.5) * grid_pitch : x]);
+}
+
 module grid_lines(xs, ys) {
-    for (r = ys) for (i = [0 : len(xs) - 2]) mid_bridged(G(xs[i], r), G(xs[i + 1], r));
-    for (c = xs) for (j = [0 : len(ys) - 2]) mid_bridged(G(c, ys[j]), G(c, ys[j + 1]));
+    for (r = ys) for (i = [0 : len(xs) - 2]) edge(G(xs[i], r), G(xs[i + 1], r));
+    for (c = xs) for (j = [0 : len(ys) - 2]) edge(G(c, ys[j]), G(c, ys[j + 1]));
 }
 
 // Four L-shaped corner marks of a box, arms `a` mm long.

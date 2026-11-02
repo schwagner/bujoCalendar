@@ -1,11 +1,15 @@
-// Hobonichi-style weekly spread for an A5 notebook with a 5 mm dot grid, pen tracing.
-// Left-hand page: seven day rows of 5 dots (25 mm), each with a date column on the outer
-// side. The right-hand page of the spread is the free memo page, which the dot grid
-// already covers, so it has no plate.
+// Hobonichi Techo Cousin-style weekly spread for an A5 notebook with a 5 mm dot grid,
+// pen tracing. Left-hand page: a vertical week of seven 3-dot (15 mm) day columns with an
+// hourly timeline on the outer edge, a header band for day names and dates, and a free
+// band at the bottom of each day. The right-hand page of the spread is the free memo page,
+// which the dot grid already covers, so it has no plate.
 //   openscad -o stencil_week.stl stencil_week.scad
 
 /* [Layout] */
 week_start = "mon"; // [mon, sun]
+// Timeline, one hour per dot row
+hour_from = 8;
+hour_to = 23;
 
 /* [Notebook] */
 page_w = 148;
@@ -61,26 +65,36 @@ $fn = 48;
 include <stencil_lib.scad>
 
 days = day_names(week_start);
-x0 = 2;      // outer end of the day rules
-xd = 6;      // date column rule
-x1 = 26;     // spine end of the day rules
-rows = [for (i = [0 : 7]) 3 + 5 * i];  // rules at dot rows 3, 8, ... 38
+x0 = 2;                                   // outer edge: week box, hour numbers
+xt = 5;                                   // timeline rail = left edge of Monday
+xs = [for (i = [0 : 7]) xt + 3 * i];      // day column lines, ends at dot column 26
+y_top = 3;                                // top of the day header band
+y_head = 6;                               // header band | timeline (hour_from)
+y_time = y_head + hour_to - hour_from;    // timeline | free band (hour_to)
+y_end = 38;                               // bottom of the week
 
 module cuts() {
-    // Week box: dates or week number
+    // Week box: month or dates
     corners(G(x0, 0), G(8, 2), 3);
-    // Day rules. Nothing closes the rows at either end, so no bridge is needed to hold
-    // a piece in; the default spacing just keeps the long strips stiff.
-    for (r = rows) bridged(G(x0, r), G(x1, r));
-    // Date column rule, bridged once per day
-    for (i = [0 : 6]) mid_bridged(G(xd, rows[i]), G(xd, rows[i + 1]));
-    // Day names, centred in the date column just under each rule
-    if (day_stencil) for (i = [0 : 6]) stencil_word(days[i], G((x0 + xd) / 2, rows[i]) - [0, 2.25 + letter_h]);
+    grid_lines(xs, [y_top, y_head, y_time, y_end]);
+    // Hour ticks on the timeline rail, longer every third hour
+    for (h = [hour_from : hour_to])
+        seg(G(xt, y_head + h - hour_from) - [h % 3 == 0 ? 6 : 3, 0], G(xt, y_head + h - hour_from));
+    // Day names, two letters, centred at the top of each header cell; date goes below
+    if (day_stencil) for (i = [0 : 6]) stencil_word(short(days[i]),
+        G((xs[i] + xs[i + 1]) / 2, y_top) - [0, 2.25 + letter_h]);
     // Registration windows, centred on dots
     for (p = [G(24, 1), G(14, 39)]) translate(p) circle(r = reg_r);
 }
 
-module labels() if (!day_stencil) for (i = [0 : 6]) translate(G(x0, rows[i]) + [1, -1.7])
-    text(days[i], size = label_size, font = label_font, valign = "top");
+function short(d) = str(d[0], d[1]);
+
+module labels() {
+    // Hour numbers beside the ticks
+    for (h = [hour_from : hour_to]) translate(G(xt, y_head + h - hour_from) + [-7.8, -0.8])
+        text(str(h), size = label_size, font = label_font, halign = "right");
+    if (!day_stencil) for (i = [0 : 6]) translate(G((xs[i] + xs[i + 1]) / 2, y_top) + [0, -1.7])
+        text(short(days[i]), size = label_size, font = label_font, halign = "center", valign = "top");
+}
 
 place() stencil_body(outer_margin, page_w - spine_gap) { cuts(); labels(); }
